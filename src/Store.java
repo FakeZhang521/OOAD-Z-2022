@@ -7,7 +7,7 @@ class Store implements ProjectMessage{
      Store(){
           // TODO: 2/7/2022 Please implement the initialization part
           //For the use of SKU attribute, please check how I coded the
-          //scheduleShipping method and shipToStore method in scheduler.java
+          //scheduleShipping method and shipToStore method in Scheduler.java
           //And cleanMailBox() method in this class.
 
           //The following is my test code.
