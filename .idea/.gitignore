@@ -1,8 +1,5 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-Item.java
-Music.java
-Player.java
-Accessory.java
-Clothing.java
+/src/Item.java
+/src/
