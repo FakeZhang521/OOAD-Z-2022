@@ -10,9 +10,9 @@ class scheduler{
       private static int day = 0;
       private static final ArrayList<Store> store = new ArrayList<>();
       private static final ArrayList<Staff> staff = new ArrayList<>();
-      private static final ArrayList<Item> waitingQueue = new ArrayList<>();
+      private static final ArrayList<ArrayList<Integer>> waitingQue = new ArrayList<>();
 
-      static void startEmunation() throws IllegalAccessException {
+      static void startEmulation() throws IllegalAccessException {
              Store store = new Store();
              Staff clerk1 = new Staff("Shaggy");
              Staff clerk2 = new Staff("Velma");
@@ -20,6 +20,7 @@ class scheduler{
              scheduler.staff.add(clerk1);
              scheduler.staff.add(clerk2);
              do{
+                 // TODO: 2/7/2022 Main loop
                  System.out.println("DAY: "+day);
                  System.out.println("--------------------------------------------");
                  shipToStore();
@@ -30,7 +31,15 @@ class scheduler{
              }while (day != 30);
       }
 
+      //This function adds the correct item to the waiting queue.
       static void shipToStore(){
+            for(ArrayList<Integer> x:waitingQue){
+                if(x.get(1) == day){
+                    store.get(0).mailBox.add(x);
+                }
+            }
+            waitingQue.removeIf(entry->entry.get(1) == day);
+
       }
 
       static void sendMessage(String event,ArrayList<Item> items){
@@ -42,8 +51,8 @@ class scheduler{
             }
       }
 
-
-      static void workAssignment() throws IllegalAccessException {
+      //Determines which staff to work.
+      private static void workAssignment() throws IllegalAccessException {
           if(staff.size() == 0)throw new IllegalAccessException("Staff list cannot be zero");
           while(true){
               int whoToWork = random.nextInt(0,staff.size());
@@ -54,23 +63,32 @@ class scheduler{
                   staff.forEach(member->{
                       if(!member.equals(tem))member.workToday = false;
                   });
+
                   break;
               }
           }
           staff.forEach(member->{if(member.dayWorked >= 3)member.dayWorked = 0;});
       }
+     //Schedule shipping
+      static void scheduleShipping(int sku){
+          for(ArrayList<Integer> x:waitingQue){
 
-      static void scheduleShipping(Item item){
-           item.dayArraived = day + random.nextInt(1,4);
-           item.purchasePrice = random.nextInt(1,51);
-           waitingQueue.add(item);
+              if(x.get(0) == sku)return;
+          }
+           int dayArrived = day + random.nextInt(1,4);
+           int purchasePrice = random.nextInt(1,51);
+           var newOrder = new ArrayList<Integer>();
+           newOrder.add(sku);
+           newOrder.add(dayArrived);
+           newOrder.add(purchasePrice);
+           waitingQue.add(newOrder);
       }
 
       static void oneDayPassed(){
           if(day == 30)return;
           day ++;
       }
-      static int getday(){
+      static int getDay(){
           return day;
       }
       static void withdrawMoney(){

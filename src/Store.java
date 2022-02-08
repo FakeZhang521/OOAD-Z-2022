@@ -1,33 +1,49 @@
 import java.util.ArrayList;
 
 class Store implements ProjectMessage{
-     double register = 0;
-     ArrayList<Item> goods;
-     ArrayList<Item> mailBox;
+     private double register = 0;
+     private final ArrayList<Item> goods;
+     final ArrayList<ArrayList<Integer>> mailBox;
      Store(){
+          // TODO: 2/7/2022 Please implement the initialization part
+          //For the use of SKU attribute, please check how I coded the
+          //scheduleShipping method and shipToStore method in scheduler.java
+          //And cleanMailBox() method in this class.
+
+          //The following is my test code.
          goods = new ArrayList<>();
          mailBox = new ArrayList<>();
-         //Implement the initialization;
+
+         Item newItem = new Hat();
+         newItem.SKU = goods.size();
+         newItem.amount = 3;
+         goods.add(newItem);
+
+         Item newItem2 = new Shirt();
+         newItem2.SKU = goods.size();
+         newItem2.amount = 3;
+         goods.add(newItem2);
+
+         Item newItem3 = new CDPlayer();
+         newItem.SKU = goods.size();
+         newItem3.amount = 3;
+         goods.add(newItem3);
+
      }
-     void cleanMailBox(){
-          for (Item box : mailBox) {
-               boolean flag = true;
-               for (int y = 0; y < goods.size(); y++) {
-                    Item current = goods.get(y);
-                    if (current.SKU == box.SKU) {
-                         current.amount++;
-                         goods.set(y, current);
-                         flag = false;
+     //Add all shipped things to the goods list.
+     private void cleanMailBox(){
+          mailBox.forEach(entry->
+               goods.forEach(item -> {
+                    if(item.SKU == entry.get(0)) {
+                         item.amount += 3;
+                         item.purchasePrice = entry.get(2);
                     }
-               }
-               if (flag) {
-                    goods.add(box);
-               }
-          }
-          mailBox = new ArrayList<>();
+               })
+          );
+          mailBox.clear();
      }
 
-     void checkMoney(){
+     private void checkMoney(){
           if(register<75){
                scheduler.sendMessage("insufficient_money",null);
           }
@@ -38,10 +54,12 @@ class Store implements ProjectMessage{
 
      void add_1000(){
           register += 1000;
+          System.out.println("Cash register now has: "+register);
      }
 
+    //return the user the goods list.
      void sumInventory(ArrayList<Item> input){
-           input = goods;
+          input.addAll(goods);
      }
 
      @Override

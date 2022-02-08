@@ -1,6 +1,6 @@
-public class Emunation {
+public class Emulation {
      public static void main(String[] args) throws IllegalAccessException {
-          scheduler.startEmunation();
+          scheduler.startEmulation();
      }
 
 }

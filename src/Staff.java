@@ -8,49 +8,78 @@ class Staff implements ProjectMessage{
             this.name = name;
             dayWorked = 0;
       }
-
-      void ArriveAtStore(){
+      //A staff member's initial action.
+      private void ArriveAtStore(){
             dayWorked ++;
-            System.out.println(name+" arrives at the store on Day "+scheduler.getday());
+            System.out.println(name+" arrives at the store on Day "+scheduler.getDay());
             scheduler.sendMessage("checkMail",null);
             CheckRegister();
       }
-      void CheckRegister(){
+      //His second action
+      private void CheckRegister(){
              scheduler.sendMessage("checkRegister",null);
             System.out.println(name+" checks cash register");
       }
-      void GoToBank(){
+      //This action will be performed, when the store object replies "insufficient money".
+      private void GoToBank(){
             scheduler.withdrawMoney();
             scheduler.sendMessage("add_1000",null);
             System.out.println(name + " goes to take some money from the bank");
+            DoInventory();
+
       }
-      void DoInventory(){
-            ArrayList<Item> buffer = new ArrayList<>();
-            scheduler.sendMessage("checkInventory",buffer);
-            int totalValue = 0;
+      //His third action.
+      //Basic logic flow:
+      //(1) Create a buffer. Java allows passing by reference when parameters are objects.
+      //(2) Send this buffer with a message "checkInventory" to the Store object.
+      //(3) Since we are just working on a single-thread program right now, No need to fear of synchronization problems.
+      //(4) Once the line "int totalValue = 0" gets executed, buffer has access to the item list.
+      //(5) the rest is a piece of cake.
+      // TODO: 2/7/2022 You can replace "item" with "item.name" 
+      private void DoInventory(){
+            final ArrayList<Item> buffer = new ArrayList<>();//This is the buffer I mentioned in (1)
+            scheduler.sendMessage("checkInventory",buffer);//(2)
+            int totalValue = 0;//(4)
             for (Item item : buffer) {
-                  if (item.purchasePrice == 0) {
-                        System.out.println(item.name + " is out of stock");
-                        PlaceAnOrder(item);
-                  }else {
-                        totalValue += item.purchasePrice;
+                  System.out.println(item +" is in our list. Amount: "+item.amount);
+                  if(item.purchasePrice<0)throw new IllegalStateException("Error:negative price.");
+                  else if (item.amount == 0) {
+                        System.out.println(item + " is out of stock");
+                        PlaceAnOrder(item.SKU);
                   }
+                  totalValue += item.purchasePrice * item.amount;
             }
             System.out.println(name+" has announced that the total value of inventory is: "+totalValue);
-
       }
 
-      void PlaceAnOrder(Item item){
-            scheduler.scheduleShipping(item);
+
+      // TODO: 2/7/2022 Each item should have an identifier "sku".Feel free to change my code if you have another idea.
+      private void PlaceAnOrder(int sku){
+            scheduler.scheduleShipping(sku);
       }
 
       void OpenTheStore(){
-
+            // TODO: 2/7/2022 Please implement this.Feel free to change my code if you have another idea.
+            // You may choose whatever approach to solve the problem.
+            //However, please consider using the message-passing style I have used in my code.
       }
 
+      void CleanTheStore(){
+            // TODO: 2/7/2022 Please implement this.Feel free to change my code if you have another idea.
+      }
+
+      void LeaveTheStore(){
+            // TODO: 2/7/2022 Please implement this.Feel free to change my code if you have another idea.
+      }
+
+      //The implementation of ProjectMessage interface
+      //Basic logic flow:
+      //The Scheduler class calls this method with a given event.
+      //This class calls its method, responding to the event.
+      //For more details, please check the sendMessage() method of the scheduler class.
       @Override
       public void receiveMessage(String event, ArrayList<Item> input) {
-            if(!workToday)return;
+            if(!workToday)return;//A staff member not working today does not respond to any message.
             switch (event) {
                   case "work" -> ArriveAtStore();
                   case "insufficient_money" -> GoToBank();

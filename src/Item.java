@@ -5,7 +5,7 @@ abstract class Item {
         double purchasePrice;
         double listPrice;
         boolean used;
-        int dayArraived;
+        int dayArrived;
         int condition;
         double salesPrice;
         int daySold;
